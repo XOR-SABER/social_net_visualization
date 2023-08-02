@@ -1,4 +1,4 @@
-<script>
+<!-- <script>
   import { invoke } from "@tauri-apps/api/tauri"
 
   let name = "";
@@ -17,4 +17,4 @@
   </form>
   <p>{greetMsg}</p>
 </div>
-
+ -->
