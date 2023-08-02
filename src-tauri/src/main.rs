@@ -12,6 +12,16 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
+#[tauri::command]
+fn open_graph(path : &str) {
+  println!("{}", path);
+}
+
+#[tauri::command]
+fn save_graph(path : &str) {
+  println!("{}", path);
+}
+
 fn main() {
     let social_graph : Graph<Friend> = Graph::new();
     let open = tauri::CustomMenuItem::new("open".to_string(), "Open");
