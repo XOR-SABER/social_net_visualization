@@ -2410,7 +2410,9 @@ checksum = "62bb4feee49fdd9f707ef802e22365a35de4b7b299de4763d44bfea899442ff9"
 name = "social_net_visualization"
 version = "0.0.0"
 dependencies = [
+ "lazy_static",
  "serde",
+ "serde_derive",
  "serde_json",
  "tauri",
  "tauri-build",

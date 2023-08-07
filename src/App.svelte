@@ -10,20 +10,36 @@
   });
 
   //This handles saving files.. 
+  appWindow.listen("saveasfile", () => {
+    call_as_save();
+  });
+
+  //This handles saving to directory.. 
   appWindow.listen("savefile", () => {
     call_save();
   });
 
   const call_open = async() => {
     try {
-      let open_path = open({
+      const open_path = await open({
         multiple: false,
         filters: [{
-          name: 'Image',
-          extensions: ['png', 'jpeg']
+          name: 'File',
+          extensions: ['txt', 'dat']
         }]
       });
-      await invoke("open_graph", { open_path });
+      const check = await invoke("open_graph", { path: open_path});
+      if(!check) throw("Backend issue")
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const call_as_save = async() => {
+    try {
+      const save_as_path = await save();
+      const check = await invoke("save_graph", {save_as_path});
+      if(!check) throw("Backend issue")
     } catch (err) {
       console.log(err);
     }
@@ -31,10 +47,13 @@
 
   const call_save = async() => {
     try {
-      let save_path = save();
-      await invoke("save_graph", {save_path});
+      const save_path = await open( {
+        directory: true,
+      });
+      const check = await invoke("save_graph", {save_path});
+      if(!check) throw("Backend issue")
     } catch (err) {
-      console.log(err);
+      console.log(err); 
     }
   }
 

@@ -3,27 +3,23 @@
   import { onMount } from 'svelte';
   import * as d3 from 'd3';
 
-  const graphData = {
-    nodes: [
-      { id: 'node1', name: 'Node 1' },
-      { id: 'node2', name: 'Node 2' },
-      { id: 'node3', name: 'Node 3' },
-      { id: 'node4', name: 'Node 4' },
-    ],
-    links: [
-      { source: 'node1', target: 'node2' },
-      { source: 'node1', target: 'node3' },
-      { source: 'node2', target: 'node3' },
-      { source: 'node3', target: 'node4' },
-    ],
-  };
+  // const graphData = {
+  //   nodes: [
+  //     { id: 'node1', name: 'Node 1' },
+  //     { id: 'node2', name: 'Node 2' },
+  //     { id: 'node3', name: 'Node 3' },
+  //     { id: 'node4', name: 'Node 4' },
+  //   ],
+  //   links: [
+  //     { source: 'node1', target: 'node2' },
+  //     { source: 'node1', target: 'node3' },
+  //     { source: 'node2', target: 'node3' },
+  //     { source: 'node3', target: 'node4' },
+  //   ],
+  // };
 
   // Convert the source and target strings to actual node objects
-  const linkData = graphData.links.map(link => ({
-    ...link,
-    source: graphData.nodes.find(node => node.id === link.source),
-    target: graphData.nodes.find(node => node.id === link.target),
-  }));
+  const graphData = null;
 
   let width = 720;
   let height = 720;
@@ -32,6 +28,12 @@
   let simulation;
 
   onMount(() => {
+
+    const linkData = graphData.links.map(link => ({
+      ...link,
+      source: graphData.nodes.find(node => node.id === link.source),
+      target: graphData.nodes.find(node => node.id === link.target),
+    }));
     // D3.js code here (same as in your previous code)
 
     // Your D3.js code here
