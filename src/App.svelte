@@ -4,6 +4,8 @@
   import { invoke } from '@tauri-apps/api/tauri';
   import { save, open} from '@tauri-apps/api/dialog';
 
+  let receivedGraphData; // Initialize with no data
+
   //This handles opening files..
   appWindow.listen("openfile", () => {
     call_open();
@@ -29,6 +31,8 @@
         }]
       });
       const check = await invoke("open_graph", { path: open_path});
+      receivedGraphData = await invoke("send_graph_nodes");
+      console.log(receivedGraphData);
       if(!check) throw("Backend issue")
     } catch (err) {
       console.log(err);
@@ -60,7 +64,12 @@
 </script>
 
 <main class="container">
-  <Graph/>
+{#if !receivedGraphData}
+<p>Waiting for graph data...</p>
+{:else}
+  
+  <Graph Data={receivedGraphData} />
+{/if}
 </main>
 
 <!-- <style>

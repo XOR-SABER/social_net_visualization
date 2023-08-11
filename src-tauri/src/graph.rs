@@ -1,11 +1,8 @@
 use core::fmt;
 use std::collections::{BTreeSet, HashMap, HashSet};
 
-use serde_derive::{Deserialize, Serialize};
-
 
 // Adj list Struct "Node"
-#[derive(Serialize, Deserialize)]
 pub struct Node<T> {
     pub key: String,
     pub data: T,
@@ -35,7 +32,6 @@ impl<T: fmt::Display> fmt::Display for Node<T> {
 }
 
 // Graph struct
-#[derive(Serialize, Deserialize)]
 pub struct Graph<T> {
     hash: HashMap<String, Node<T>>,
 }
@@ -81,6 +77,16 @@ impl<T> Graph<T> {
             self.remove_connection(key, &conn);
         }
         true
+    }
+
+
+    // Sends the graph to the visualizer
+    pub fn send_graph(&self) -> Vec<(String, Vec<String>)> {
+        let mut retval : Vec<(String, Vec<String>)> = Vec::new();
+        for key in &self.hash {
+            retval.push((key.0.to_string(),key.1.list.clone().into_iter().collect()));
+        }
+        return retval;
     }
 
     pub fn print_network(&self, from: &str) -> HashSet<String> {

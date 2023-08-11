@@ -1,7 +1,5 @@
-use serde_derive::{Deserialize, Serialize};
-use core::fmt;
 
-#[derive(Serialize, Deserialize)]
+use core::fmt;
 pub struct Friend {
     name: String,
 }

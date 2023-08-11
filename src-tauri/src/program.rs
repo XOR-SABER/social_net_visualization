@@ -11,7 +11,11 @@ pub fn graph_from_file(path: &str) -> Result<Graph<Friend>, String> {
     let mut buffer = String::new();
     reader.read_to_string(&mut buffer).map_err(|err| err.to_string())?;
 
-    let lines: Vec<String> = buffer.split('\n').map(|s| s.to_string()).collect();
+    let lines: Vec<String> = buffer
+        .lines()
+        .map(|s| s.replace("\r", "")) // Remove carriage returns
+        .collect();
+
 
     // Check if the file contains at least one signature.
     if lines.is_empty() || lines[0].trim() != "AB_VISUALIZER" {
@@ -31,6 +35,9 @@ pub fn graph_from_file(path: &str) -> Result<Graph<Friend>, String> {
         if split_list.len() > 1 {
             let partition: Vec<String> = split_list[1].split(" ").map(String::from).collect();
             for part in partition {
+                if(part.is_empty()) {
+                    continue;
+                }
                 new_graph.add_connection(&split_list[0], &part);
             }
         }

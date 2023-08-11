@@ -16,7 +16,8 @@ fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             open_graph,
-            save_graph
+            save_graph,
+            send_graph_nodes
         ])
         .menu(menu)
         .on_menu_event(|event| {

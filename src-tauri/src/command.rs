@@ -28,13 +28,15 @@ pub fn open_graph(path: &str) -> bool {
   }
 }
 
-#[tauri::command]
-pub fn send_graph_data() -> String{
-  let mut global_var = GLOBAL_GRAPH.lock().unwrap();
 
-  let serialized_data = serde_json::to_string(&*global_var);
-  return serialized_data.unwrap().to_string();
+#[tauri::command]
+pub fn send_graph_nodes() -> Vec<(String, Vec<String>)> {
+  // Grab a refrence to the graph
+  let binding = GLOBAL_GRAPH.lock();
+  let graph_ref = binding.as_ref().unwrap();
+  return graph_ref.send_graph();
 }
+  
 
 
 // this is going to be done last.. 
