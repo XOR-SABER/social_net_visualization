@@ -79,7 +79,6 @@ impl<T> Graph<T> {
         true
     }
 
-
     // Sends the graph to the visualizer
     pub fn send_graph(&self) -> Vec<(String, Vec<String>)> {
         let mut retval : Vec<(String, Vec<String>)> = Vec::new();
@@ -87,6 +86,14 @@ impl<T> Graph<T> {
             retval.push((key.0.to_string(),key.1.list.clone().into_iter().collect()));
         }
         return retval;
+    }
+
+    pub fn get_connections(&self, from: & str) -> Vec<String> {
+        if !self.hash.contains_key(from) {
+            return Vec::new();
+        }
+        let retval : Vec<String> = self.hash.get(from).unwrap().list.clone().into_iter().collect();
+        retval
     }
 
     pub fn print_network(&self, from: &str) -> HashSet<String> {

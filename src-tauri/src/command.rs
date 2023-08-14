@@ -10,6 +10,7 @@ lazy_static! {
   static ref GLOBAL_GRAPH:  Arc<Mutex<Graph<Friend>>> = Arc::new(Mutex::new(Graph::new()));
 }
 
+// Builds the graph in backend.. 
 #[tauri::command]
 pub fn open_graph(path: &str) -> bool {
     // call the constructor..
@@ -18,7 +19,6 @@ pub fn open_graph(path: &str) -> bool {
       Ok(graph) => {
           let mut global_var = GLOBAL_GRAPH.lock().unwrap();
           *global_var = graph;
-          println!("CONVERSION DONE!\n {}", *global_var);
           true
       }
       Err(error) => {
@@ -29,6 +29,7 @@ pub fn open_graph(path: &str) -> bool {
 }
 
 
+//Sends the graph to the frontend.. 
 #[tauri::command]
 pub fn send_graph_nodes() -> Vec<(String, Vec<String>)> {
   // Grab a refrence to the graph
@@ -37,6 +38,16 @@ pub fn send_graph_nodes() -> Vec<(String, Vec<String>)> {
   return graph_ref.send_graph();
 }
   
+
+// Sends the connections from a node into the frontend.. 
+#[tauri::command]
+pub fn send_graph_connections(id: &str) -> Vec<String> {
+  let binding = GLOBAL_GRAPH.lock();
+  let graph_ref = binding.as_ref().unwrap();
+  return graph_ref.get_connections(id);
+}
+
+
 
 
 // this is going to be done last.. 

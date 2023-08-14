@@ -35,7 +35,7 @@ pub fn graph_from_file(path: &str) -> Result<Graph<Friend>, String> {
         if split_list.len() > 1 {
             let partition: Vec<String> = split_list[1].split(" ").map(String::from).collect();
             for part in partition {
-                if(part.is_empty()) {
+                if part.is_empty() {
                     continue;
                 }
                 new_graph.add_connection(&split_list[0], &part);
