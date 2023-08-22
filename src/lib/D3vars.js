@@ -24,6 +24,15 @@ export function setupSimulation(width, height, nodeStrength, linkDistance) {
         .force("center", d3.forceCenter(width / 2, height / 2));
 }
 
+function isMutual(d, parsed_data) {
+    return (parsed_data.LinkElms[
+        parsed_data.NodeElms.indexOf(d.source.id)
+    ].includes(d.target.id) &&
+    parsed_data.LinkElms[
+        parsed_data.NodeElms.indexOf(d.target.id)
+    ].includes(d.source.id));
+}
+
 export function createLinks(svg, linkData, parsed_data) {
     // ...
     svg.append("defs")
@@ -51,14 +60,8 @@ export function createLinks(svg, linkData, parsed_data) {
         .style("stroke", "#464F51")
         .style("stroke-width", 2)
         .attr("marker-end", (d) => {
-            const isMutual =
-                parsed_data.LinkElms[
-                    parsed_data.NodeElms.indexOf(d.source.id)
-                ].includes(d.target.id) &&
-                parsed_data.LinkElms[
-                    parsed_data.NodeElms.indexOf(d.target.id)
-                ].includes(d.source.id);
-            return isMutual ? "" : "url(#arrow)";
+            const isMutu = isMutual(d, parsed_data);
+            return isMutu ? "" : "url(#arrow)";
         });
 }
 

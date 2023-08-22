@@ -9,8 +9,8 @@ mod graph;
 
 fn main() {
     let open = tauri::CustomMenuItem::new("open".to_string(), "Open");
-    let save: CustomMenuItem = tauri::CustomMenuItem::new("saveAs".to_string(), "SaveAs");
-    let file_submenu = Submenu::new("Files", Menu::new().add_item(open).add_item(save));
+    let save_as: CustomMenuItem = tauri::CustomMenuItem::new("saveAs".to_string(), "Save as");
+    let file_submenu = Submenu::new("Files", Menu::new().add_item(open).add_item(save_as));
     let menu = Menu::new()
         .add_submenu(file_submenu);
     tauri::Builder::default()
@@ -36,7 +36,6 @@ fn main() {
               _ => {}
             }
           })
-        // .invoke_handler(tauri::generate_handler![greet])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -1,6 +1,5 @@
-use core::fmt;
-use std::collections::{BTreeSet, HashMap, HashSet};
-
+pub use core::fmt;
+use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
 
 // Adj list Struct "Node"
 pub struct Node<T> {
@@ -81,22 +80,28 @@ impl<T> Graph<T> {
 
     // Sends the graph to the visualizer
     pub fn send_graph(&self) -> Vec<(String, Vec<String>)> {
-        let mut retval : Vec<(String, Vec<String>)> = Vec::new();
+        let mut retval: Vec<(String, Vec<String>)> = Vec::new();
         for key in &self.hash {
-            retval.push((key.0.to_string(),key.1.list.clone().into_iter().collect()));
+            retval.push((key.0.to_string(), key.1.list.clone().into_iter().collect()));
         }
         return retval;
     }
 
-    pub fn get_connections(&self, from: & str) -> Vec<String> {
+    pub fn get_connections(&self, from: &str) -> Vec<String> {
         if !self.hash.contains_key(from) {
             return Vec::new();
         }
-        let retval : Vec<String> = self.hash.get(from).unwrap().list.clone().into_iter().collect();
-        retval
+        self
+            .hash
+            .get(from)
+            .unwrap()
+            .list
+            .clone()
+            .into_iter()
+            .collect()
     }
 
-    pub fn print_network(&self, from: &str) -> HashSet<String> {
+    pub fn print_network(&self, from: &str) -> Vec<String> {
         let mut processed = HashSet::new();
         let mut to_process = vec![from.to_string()];
         while !to_process.is_empty() {
@@ -110,10 +115,51 @@ impl<T> Graph<T> {
                 }
             }
         }
-        processed
+        let retval: Vec<String> = processed.into_iter().collect();
+        retval
+    }
+
+    pub fn print_dfs(&self, from: &str) -> Vec<String> {
+        let mut order_list: Vec<String> = Vec::new();
+        let mut process_list: HashSet<String> = HashSet::new();
+        self.dfs_rec(from, &mut order_list, &mut process_list);
+        order_list
+    }
+
+    // Fuck I hate recursion...
+    fn dfs_rec(&self, node: &str, list: &mut Vec<String>, hash: &mut HashSet<String>) {
+        if hash.contains(node) {
+            return;
+        }
+        hash.insert(node.to_string());
+        // Processing starts here
+        list.push(node.to_string());
+        for str in self.get_connections(node) {
+            self.dfs_rec(str.as_str(), list, hash);
+        }
+    }
+
+    // This is actually the easist one
+    pub fn print_bfs(&self, from: &str) -> Vec<String> {
+        let mut queue: VecDeque<String> = VecDeque::new();
+        let mut process_list: HashSet<String> = HashSet::new();
+        let mut visted: Vec<String> = Vec::new();
+        queue.push_back(from.to_string());
+
+        while !queue.is_empty() {
+            let current: String = queue.pop_front().unwrap();
+            visted.push(current.clone());
+            process_list.insert(current.clone());
+            for str in self.get_connections(&current) {
+                if !process_list.contains(&str) {
+                    process_list.insert(str.clone());
+                    queue.push_back(str);
+                }
+            }
+        }
+        visted
     }
 }
-
 
 //Cool way todo operator overloading
 impl<T: fmt::Display> fmt::Display for Graph<T> {

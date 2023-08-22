@@ -17,7 +17,7 @@ pub fn graph_from_file(path: &str) -> Result<Graph<Friend>, String> {
         .collect();
 
 
-    // Check if the file contains at least one signature.
+    // Check if the file contains the signature.
     if lines.is_empty() || lines[0].trim() != "AB_VISUALIZER" {
         return Err("INVALID FILE! NOT RIGHT TYPE!".to_string());
     }

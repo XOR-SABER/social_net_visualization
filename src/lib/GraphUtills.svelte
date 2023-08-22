@@ -1,6 +1,8 @@
 <script>
     import * as D3vars from "./D3vars.js";
     import { onMount } from "svelte";
+    import CustomButton from "./CustomButton.svelte";
+    import CustomSlider from "./CustomSlider.svelte";
     import * as d3 from "d3";
 
     export let width;
@@ -12,7 +14,14 @@
     let linkDistance = 100;
     let nodeStrength = -10;
 
-    const simulation = D3vars.setupSimulation(width, height, nodeStrength, linkDistance);
+    let selectedNode = "";
+
+    const simulation = D3vars.setupSimulation(
+        width,
+        height,
+        nodeStrength,
+        linkDistance
+    );
 
     const updateGraph = () => {
         simulation.force("link").distance(linkDistance);
@@ -22,6 +31,10 @@
             .force("charge", d3.forceManyBody().strength(nodeStrength))
             .force("center", d3.forceCenter(width / 2, height / 2));
     };
+
+    function handleButtonClick() {
+        console.log("Custom button clicked!");
+    }
 
     onMount(() => {
         const linkData = graphData.links.map((link) => ({
@@ -47,7 +60,10 @@
                     .on("end", dragEnded)
             )
             .on("mousemove", handleMouseMove)
-            .on("mouseout", handleMouseOut);
+            .on("mouseout", handleMouseOut)
+            .on("click", (event, d) => {
+                handleNodeClick(event, d);
+            });
 
         function handleMouseMove(event, d) {
             const [mouseX, mouseY] = d3.pointer(event);
@@ -58,6 +74,14 @@
                 .style("top", mouseY - 20 + "px");
 
             updateNodeStyling(d.id);
+        }
+
+        function handleNodeClick(event, node) {
+            event.stopPropagation();
+            // Implement your logic to display options for the clicked node
+            console.log("Node clicked:", node.id);
+            selectedNode = node.id;
+            // You can show a modal or update a state to show options
         }
 
         function handleMouseOut() {
@@ -140,25 +164,37 @@
 
 <div id="graph">
     <div class="slider-container">
-        <input
-            type="range"
-            min="1"
-            max="500"
-            step="1"
+        <CustomSlider
+            min={0}
+            max={500}
+            step={1}
+            label="Link Distance"
+            onMove={updateGraph}
             bind:value={linkDistance}
-            class="slider"
-            on:input={updateGraph}
         />
-        <span class="slider-label">Link Distance: {linkDistance}</span>
-        <input
-            type="range"
-            min="-300"
-            max="100"
-            step="1"
+        <CustomSlider
+            min={-300}
+            max={300}
+            step={1}
+            label="Node Strength"
+            onMove={updateGraph}
             bind:value={nodeStrength}
-            class="slider"
-            on:input={updateGraph}
         />
-        <span class="slider-label">Strength: {nodeStrength}</span>
+        <CustomButton
+            label="Click Me"
+            color="green"
+            onClick={handleButtonClick}
+        />
     </div>
 </div>
+
+<style>
+    .slider-container {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+</style>
