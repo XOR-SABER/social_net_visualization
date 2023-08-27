@@ -4,8 +4,8 @@
   import GraphUtills from "./GraphUtills.svelte";
 
   // This the modifiable variables
-  let width = 700;
-  let height = 700;
+  let width = window.innerWidth;
+  let height = window.innerHeight;
 
   // This the data we initlaize the graph with
   export let Data;

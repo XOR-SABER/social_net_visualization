@@ -1,12 +1,27 @@
 <script>
     export let label = "Button";
-    export let color = "blue";
+    export let bgcolor = "none";
+    export let txcolor = "none";
+    export let border = "none";
+    export let isToggle = "false";
     export let onClick = () => {}; // Default click handler
+    
+    let buttonStyle = "";
+
+    const handleCick = () => {
+      if(isToggle === "true" || isToggle === "True") {
+        
+      } else {
+
+      }
+
+    }
+
   </script>
   
   <button
     class="custom-button"
-    style="background-color: {color};"
+    style="background-color: {bgcolor}; border: {border}; color: {txcolor};"
     on:click={onClick}
   >
     {label}
@@ -16,10 +31,8 @@
     .custom-button {
       padding: 10px 20px;
       border: none;
-      color: white;
       cursor: pointer;
-      border-radius: 5px;
-      transition: background-color 0.2s ease;
+      border-radius: 2px;
     }
   </style>
   

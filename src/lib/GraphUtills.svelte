@@ -1,8 +1,8 @@
 <script>
     import * as D3vars from "./D3vars.js";
-    import { onMount } from "svelte";
     import CustomButton from "./CustomButton.svelte";
     import CustomSlider from "./CustomSlider.svelte";
+    import { onMount } from "svelte";
     import * as d3 from "d3";
 
     export let width;
@@ -13,8 +13,12 @@
 
     let linkDistance = 100;
     let nodeStrength = -10;
-
     let selectedNode = "";
+    let tooltip;
+    let link;
+    let node;
+    let svg;
+    
 
     const simulation = D3vars.setupSimulation(
         width,
@@ -28,13 +32,36 @@
         simulation.alpha(1).restart();
         // Recenter the nodes
         simulation
-            .force("charge", d3.forceManyBody().strength(nodeStrength))
-            .force("center", d3.forceCenter(width / 2, height / 2));
+            .force("charge", d3.forceManyBody().strength(nodeStrength));
+            // .force("center", d3.forceCenter(width / 2, height / 2));
     };
 
     function handleButtonClick() {
         console.log("Custom button clicked!");
     }
+
+    function handleConnections() {
+        updateNodeStyling(selectedNode);
+    }
+
+    async function updateNodeStyling(clickedID) {
+            node.style("fill", (d) => {
+                if (d.id === selectedNode) return "green"
+                if (clickedID === null) return "#724cf9";
+                if (!connection_cache.has(clickedID)) return "#724cf9";
+                const cacheValue = Array(connection_cache.get(clickedID));
+                if (cacheValue.length == 0) return "#724cf9";
+                // I FUCKING HATE JAVASCRIPT AAAHHH!
+
+                const isIdInCache = cacheValue.at(0).includes(d.id);
+                if (isIdInCache) {
+                    console.log("Changed!");
+                    return "red";
+                } else {
+                    return "#724cf9";
+                }
+            });
+        }
 
     onMount(() => {
         const linkData = graphData.links.map((link) => ({
@@ -45,13 +72,13 @@
         // D3.js code here (same as in your previous code)
 
         // Your D3.js code here
-        const svg = D3vars.setupSVG(width, height);
+        svg = D3vars.setupSVG(width, height);
 
-        const link = D3vars.createLinks(svg, linkData, parsed_data);
+        link = D3vars.createLinks(svg, linkData, parsed_data);
 
-        const tooltip = D3vars.createTooltip();
+        tooltip = D3vars.createTooltip();
 
-        const node = D3vars.createNodes(svg, graphData)
+        node = D3vars.createNodes(svg, graphData)
             .call(
                 d3
                     .drag()
@@ -73,7 +100,7 @@
                 .style("left", mouseX + 10 + "px")
                 .style("top", mouseY - 20 + "px");
 
-            updateNodeStyling(d.id);
+            // updateNodeStyling(d.id);
         }
 
         function handleNodeClick(event, node) {
@@ -86,25 +113,10 @@
 
         function handleMouseOut() {
             tooltip.style("opacity", 0);
-            updateNodeStyling(null);
+            // updateNodeStyling(null);
         }
 
-        async function updateNodeStyling(clickedID) {
-            node.style("fill", (d) => {
-                if (clickedID === null) return "#724cf9";
-                if (!connection_cache.has(clickedID)) return "#724cf9";
-                const cacheValue = Array(connection_cache.get(clickedID));
-                if (cacheValue.length == 0) return "#724cf9";
-                // I FUCKING HATE JAVASCRIPT AAAHHH!
-                const isIdInCache = cacheValue.at(0).includes(d.id);
-                if (isIdInCache) {
-                    console.log("Changed!");
-                    return "red";
-                } else {
-                    return "#724cf9";
-                }
-            });
-        }
+
 
         simulation.nodes(graphData.nodes).on("tick", ticked);
         simulation.force("link").links(linkData); // Use the updated linkData array
@@ -163,7 +175,35 @@
 </script>
 
 <div id="graph">
-    <div class="slider-container">
+    <div class="options_container">
+        {#if selectedNode}
+            <p>Current node selected: {selectedNode}</p>
+            <CustomButton
+                label="DFS"
+                border="solid white 2px"
+                bgcolor="black"
+                txcolor="white"
+                onClick={handleButtonClick}
+            />
+            <CustomButton
+                label="BFS"
+                border="solid white 2px"
+                bgcolor="black"
+                txcolor="white"
+                onClick={handleButtonClick}
+            />
+            <CustomButton
+                label="Connections"
+                border="solid white 2px"
+                bgcolor="black"
+                txcolor="white"
+                isToggle ="false"
+                onClick={handleConnections}
+                
+            />
+        {/if}
+    </div>
+    <div class="slider_container">
         <CustomSlider
             min={0}
             max={500}
@@ -180,16 +220,19 @@
             onMove={updateGraph}
             bind:value={nodeStrength}
         />
-        <CustomButton
-            label="Click Me"
-            color="green"
-            onClick={handleButtonClick}
-        />
     </div>
 </div>
 
 <style>
-    .slider-container {
+    .options_container {
+        position: absolute;
+        margin-left: auto;
+        margin-right: auto;
+        left: 0;
+        right: 0;
+        text-align: center;
+    }
+    .slider_container {
         position: absolute;
         top: 20px;
         right: 20px;
