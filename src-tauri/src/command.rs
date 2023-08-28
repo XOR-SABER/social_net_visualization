@@ -59,6 +59,7 @@ pub fn save_graph(path : &str) -> bool {
 pub fn send_bfs(id: &str) -> Vec<String> {
   let binding = GLOBAL_GRAPH.lock();
   let graph_ref = binding.as_ref().unwrap();
+  println!("{:?}", graph_ref.print_bfs(id));
   graph_ref.print_bfs(id)
 }
 
@@ -66,5 +67,6 @@ pub fn send_bfs(id: &str) -> Vec<String> {
 pub fn send_dfs(id: &str) -> Vec<String> {
   let binding = GLOBAL_GRAPH.lock();
   let graph_ref = binding.as_ref().unwrap();
+  println!("{:?}", graph_ref.print_dfs(id));
   graph_ref.print_dfs(id)
 }

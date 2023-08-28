@@ -4,6 +4,7 @@
     import CustomSlider from "./CustomSlider.svelte";
     import { onMount } from "svelte";
     import * as d3 from "d3";
+    import { invoke } from "@tauri-apps/api/tauri";
 
     export let width;
     export let height;
@@ -18,7 +19,6 @@
     let link;
     let node;
     let svg;
-    
 
     const simulation = D3vars.setupSimulation(
         width,
@@ -36,34 +36,83 @@
             .force("center", d3.forceCenter(width / 2, height / 2));
     };
 
-    function handleButtonClick() {
-        console.log("Custom button clicked!");
-        
+    const handleConnections = (value) => {
+        console.log("Handler Connections");
+        if (value) connectionNodeStyling();
+        else updateNodeStyling();
+    };
+
+    const handleDfs = (value) => {
+        console.log("Handler DFS");
+        if (value) dfsNodeStyling();
+        else updateNodeStyling();
+    };
+
+    const handleBfs = (value) => {
+        console.log("Handler BFS");
+        if (value) bfsNodeStyling();
+        else updateNodeStyling();
+    };
+
+    async function bfsNodeStyling() {
+        const conncections = await invoke("send_bfs", { id: selectedNode });
+        console.log(conncections);
+        let colorIndex = 0;
+        node.style("fill", (d) => {
+            const HSLStr = "HSL(" + colorIndex + ", 100%, 50%";
+            if (d.id === selectedNode) return "green";
+            if (conncections.includes(d.id)) {
+                colorIndex += 25;
+                return HSLStr;
+            } else return "#724cf9";
+        });
     }
 
-    function handleConnections(value) {
-        if(value) updateNodeStyling(selectedNode);
-        else updateNodeStyling()
+    async function dfsNodeStyling() {
+        const conncections = await invoke("send_dfs", { id: selectedNode });
+        console.log(conncections);
+        let colorIndex = 0;
+        node.style("fill", (d) => {
+            const HSLStr = "HSL(" + colorIndex + ", 100%, 50%";
+            if (d.id === selectedNode) return "green";
+            if (conncections.includes(d.id)) {
+                colorIndex += 25;
+                return HSLStr;
+            } else return "#724cf9";
+        });
+    }
+
+    async function connectionNodeStyling() {
+        const conncections = await invoke("send_graph_connections", {
+            id: selectedNode,
+        });
+        console.log(conncections);
+        node.style("fill", (d) => {
+            if (d.id === selectedNode) return "green";
+            if (conncections.includes(d.id)) {
+                return "red";
+            } else return "#724cf9";
+        });
     }
 
     async function updateNodeStyling(clickedID) {
-            node.style("fill", (d) => {
-                if (d.id === selectedNode) return "green"
-                if (clickedID === null) return "#724cf9";
-                if (!connection_cache.has(clickedID)) return "#724cf9";
-                const cacheValue = Array(connection_cache.get(clickedID));
-                if (cacheValue.length == 0) return "#724cf9";
-                // I FUCKING HATE JAVASCRIPT AAAHHH!
+        node.style("fill", (d) => {
+            if (d.id === selectedNode) return "green";
+            if (clickedID === null) return "#724cf9";
+            if (!connection_cache.has(clickedID)) return "#724cf9";
+            const cacheValue = Array(connection_cache.get(clickedID));
+            if (cacheValue.length == 0) return "#724cf9";
+            // I FUCKING HATE JAVASCRIPT AAAHHH!
 
-                const isIdInCache = cacheValue.at(0).includes(d.id);
-                if (isIdInCache) {
-                    console.log("Changed!");
-                    return "red";
-                } else {
-                    return "#724cf9";
-                }
-            });
-        }
+            const isIdInCache = cacheValue.at(0).includes(d.id);
+            if (isIdInCache) {
+                console.log("Changed!");
+                return "red";
+            } else {
+                return "#724cf9";
+            }
+        });
+    }
 
     onMount(() => {
         const linkData = graphData.links.map((link) => ({
@@ -118,7 +167,6 @@
             tooltip.style("opacity", 0);
             // updateNodeStyling(null);
         }
-
 
         simulation.alpha(0.1).restart();
         simulation.nodes(graphData.nodes).on("tick", ticked);
@@ -186,7 +234,9 @@
                 borderColor="white"
                 bgColor="black"
                 txColor="white"
-                onClick={handleButtonClick}
+                isToggle="true"
+                toggleColor="Green"
+                onToggle={handleDfs}
             />
             <CustomButton
                 label="BFS"
@@ -194,7 +244,9 @@
                 borderColor="white"
                 bgColor="black"
                 txColor="white"
-                onClick={handleButtonClick}
+                isToggle="true"
+                toggleColor="Green"
+                onToggle={handleBfs}
             />
             <CustomButton
                 label="Connections"
@@ -202,10 +254,9 @@
                 borderColor="white"
                 bgColor="black"
                 txColor="white"
-                isToggle ="true"
+                isToggle="true"
                 toggleColor="Green"
                 onToggle={handleConnections}
-                
             />
         {/if}
     </div>
