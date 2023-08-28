@@ -18,7 +18,9 @@ fn main() {
             open_graph,
             save_graph,
             send_graph_nodes,
-            send_graph_connections
+            send_graph_connections,
+            send_bfs,
+            send_dfs,
         ])
         .menu(menu)
         .on_menu_event(|event| {

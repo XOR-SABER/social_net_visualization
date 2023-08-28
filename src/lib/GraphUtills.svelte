@@ -29,19 +29,21 @@
 
     const updateGraph = () => {
         simulation.force("link").distance(linkDistance);
-        simulation.alpha(1).restart();
+        simulation.alpha(0.1).restart();
         // Recenter the nodes
         simulation
-            .force("charge", d3.forceManyBody().strength(nodeStrength));
-            // .force("center", d3.forceCenter(width / 2, height / 2));
+            .force("charge", d3.forceManyBody().strength(nodeStrength))
+            .force("center", d3.forceCenter(width / 2, height / 2));
     };
 
     function handleButtonClick() {
         console.log("Custom button clicked!");
+        
     }
 
-    function handleConnections() {
-        updateNodeStyling(selectedNode);
+    function handleConnections(value) {
+        if(value) updateNodeStyling(selectedNode);
+        else updateNodeStyling()
     }
 
     async function updateNodeStyling(clickedID) {
@@ -108,6 +110,7 @@
             // Implement your logic to display options for the clicked node
             console.log("Node clicked:", node.id);
             selectedNode = node.id;
+            updateNodeStyling();
             // You can show a modal or update a state to show options
         }
 
@@ -117,7 +120,7 @@
         }
 
 
-
+        simulation.alpha(0.1).restart();
         simulation.nodes(graphData.nodes).on("tick", ticked);
         simulation.force("link").links(linkData); // Use the updated linkData array
 
@@ -133,7 +136,6 @@
             }).attr("cy", (d) => {
                 return (d.y = Math.max(0, Math.min(height, d.y)));
             });
-
             // updateNodeStyling();
         }
 
@@ -150,7 +152,7 @@
         }
 
         function dragEnded(event, d) {
-            if (!event.active) simulation.alphaTarget(0.001);
+            if (!event.active) simulation.alphaTarget(0.1).restart();
             d.fx = null;
             d.fy = null;
         }
@@ -166,7 +168,7 @@
             simulation.force("center", d3.forceCenter(width / 2, height / 2));
 
             // Restart the simulation to update the positions of nodes and links
-            simulation.alpha(1).restart();
+            simulation.alpha(0.1).restart();
         }
 
         // Add window resize event listener
@@ -180,25 +182,29 @@
             <p>Current node selected: {selectedNode}</p>
             <CustomButton
                 label="DFS"
-                border="solid white 2px"
-                bgcolor="black"
-                txcolor="white"
+                border="solid 2px"
+                borderColor="white"
+                bgColor="black"
+                txColor="white"
                 onClick={handleButtonClick}
             />
             <CustomButton
                 label="BFS"
-                border="solid white 2px"
-                bgcolor="black"
-                txcolor="white"
+                border="solid 2px"
+                borderColor="white"
+                bgColor="black"
+                txColor="white"
                 onClick={handleButtonClick}
             />
             <CustomButton
                 label="Connections"
-                border="solid white 2px"
-                bgcolor="black"
-                txcolor="white"
-                isToggle ="false"
-                onClick={handleConnections}
+                border="solid 2px"
+                borderColor="white"
+                bgColor="black"
+                txColor="white"
+                isToggle ="true"
+                toggleColor="Green"
+                onToggle={handleConnections}
                 
             />
         {/if}

@@ -101,24 +101,6 @@ impl<T> Graph<T> {
             .collect()
     }
 
-    pub fn print_network(&self, from: &str) -> Vec<String> {
-        let mut processed = HashSet::new();
-        let mut to_process = vec![from.to_string()];
-        while !to_process.is_empty() {
-            let current = to_process.pop().unwrap();
-            if !processed.contains(&current) {
-                processed.insert(current.clone());
-                if let Some(node) = self.hash.get(&current) {
-                    for conn in &node.list {
-                        to_process.push(conn.clone());
-                    }
-                }
-            }
-        }
-        let retval: Vec<String> = processed.into_iter().collect();
-        retval
-    }
-
     pub fn print_dfs(&self, from: &str) -> Vec<String> {
         let mut order_list: Vec<String> = Vec::new();
         let mut process_list: HashSet<String> = HashSet::new();

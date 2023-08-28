@@ -1,28 +1,39 @@
 <script>
     export let label = "Button";
-    export let bgcolor = "none";
-    export let txcolor = "none";
+    export let bgColor = "none";
+    export let txColor = "none";
     export let border = "none";
+    export let borderColor = "none";
     export let isToggle = "false";
+    export let toggleColor = "none";
     export let onClick = () => {}; // Default click handler
+    export let onToggle = (value) => {}
     
-    let buttonStyle = "";
+    const initalStyle = `background-color: ${bgColor}; border: ${border} ${borderColor}; color: ${txColor};`;
+    let buttonStyle = initalStyle;
+    let isActive = false;
 
     const handleCick = () => {
-      if(isToggle === "true" || isToggle === "True") {
-        
+      console.log(isToggle);
+      if((isToggle === "true" || isToggle === "True") && !isActive) {
+        buttonStyle = `background-color: ${bgColor}; border: ${border} ${toggleColor}; color: ${toggleColor};`
+        isActive = true;
+        onToggle(true);
+      } else if (isActive) {
+        isActive = false;
+        onToggle(false);
+        buttonStyle = initalStyle;
       } else {
-
+        onClick();
       }
-
     }
 
   </script>
   
   <button
     class="custom-button"
-    style="background-color: {bgcolor}; border: {border}; color: {txcolor};"
-    on:click={onClick}
+    style="{buttonStyle}"
+    on:click={handleCick}
   >
     {label}
   </button>

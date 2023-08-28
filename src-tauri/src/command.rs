@@ -34,7 +34,7 @@ pub fn send_graph_nodes() -> Vec<(String, Vec<String>)> {
   // Grab a refrence to the graph
   let binding = GLOBAL_GRAPH.lock();
   let graph_ref = binding.as_ref().unwrap();
-  return graph_ref.send_graph();
+  graph_ref.send_graph()
 }  
 
 // Sends the connections from a node into the frontend.. 
@@ -42,7 +42,7 @@ pub fn send_graph_nodes() -> Vec<(String, Vec<String>)> {
 pub fn send_graph_connections(id: &str) -> Vec<String> {
   let binding = GLOBAL_GRAPH.lock();
   let graph_ref = binding.as_ref().unwrap();
-  return graph_ref.get_connections(id);
+  graph_ref.get_connections(id)
 }
 
 // this is going to be done last.. 
@@ -52,5 +52,19 @@ pub fn save_graph(path : &str) -> bool {
   // give it a name.. 
   // write to file.. 
   println!("{}", path);
-  return true;
+  true
+}
+
+#[tauri::command]
+pub fn send_bfs(id: &str) -> Vec<String> {
+  let binding = GLOBAL_GRAPH.lock();
+  let graph_ref = binding.as_ref().unwrap();
+  graph_ref.print_bfs(id)
+}
+
+#[tauri::command]
+pub fn send_dfs(id: &str) -> Vec<String> {
+  let binding = GLOBAL_GRAPH.lock();
+  let graph_ref = binding.as_ref().unwrap();
+  graph_ref.print_dfs(id)
 }
