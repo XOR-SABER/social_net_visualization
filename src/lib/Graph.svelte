@@ -10,14 +10,6 @@
   // This the data we initlaize the graph with
   export let Data;
 
-  //Cache all the connections
-  const connection_cache = new Map();
-
-  async function add_into_hash(str) {
-    const connections = await invoke("send_graph_connections", { id: str });
-    if (connections.length > 0) connection_cache.set(str, connections);
-  }
-
   const split_data = (Data) => {
     let temp = {
       NodeElms: [],
@@ -28,7 +20,6 @@
     Data.forEach((pair) => {
       const [first, second] = pair;
       temp.NodeElms.push(first);
-      add_into_hash(first);
       temp.LinkElms.push(second);
     });
 
@@ -62,5 +53,5 @@
 </script>
 
 <div>
-  <GraphUtills {width} {height} {graphData} {connection_cache} {parsed_data} />
+  <GraphUtills {width} {height} {graphData} {parsed_data} />
 </div>

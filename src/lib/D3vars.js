@@ -9,7 +9,6 @@ export function setupSVG(width, height) {
 }
 
 export function setupSimulation(width, height, nodeStrength, linkDistance) {
-    // ...
     return d3
         .forceSimulation()
         .force(
@@ -34,10 +33,9 @@ function isMutual(d, parsed_data) {
 }
 
 export function createLinks(svg, linkData, parsed_data) {
-    // ...
     svg.append("defs")
         .selectAll("marker")
-        .data(["arrow"])
+        .data(["arrow", "arrow-white"])
         .enter()
         .append("marker")
         .attr("id", (d) => d)
@@ -49,7 +47,7 @@ export function createLinks(svg, linkData, parsed_data) {
         .attr("orient", "auto")
         .append("path")
         .attr("d", "M0,-5L10,0L0,5")
-        .attr("fill", "#737a86");
+        .attr("fill", (d) => (d === "arrow" ? "#737a86" : "white")); // Set fill color for arrow-white
 
     return svg
         .append("g")
@@ -61,9 +59,10 @@ export function createLinks(svg, linkData, parsed_data) {
         .style("stroke-width", 2)
         .attr("marker-end", (d) => {
             const isMutu = isMutual(d, parsed_data);
-            return isMutu ? "" : "url(#arrow)";
+            return isMutu ? "" : "url(#arrow)"; // Use arrow-white marker
         });
 }
+
 
 export function createTooltip() {
     return d3
@@ -81,7 +80,6 @@ export function createTooltip() {
 }
 
 export function createNodes(svg, graphData) {
-    // ...
     return svg
         .append("g")
         .selectAll("circle")

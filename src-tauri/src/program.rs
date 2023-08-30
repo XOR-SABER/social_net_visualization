@@ -30,7 +30,7 @@ pub fn graph_from_file(path: &str) -> Result<Graph<Friend>, String> {
 
         let split_list: Vec<String> = line.split(" : ").map(String::from).collect();
         let new_node: Node<Friend> = Node::new(split_list[0].clone(), Friend::new(split_list[0].clone()));
-        new_graph.add_node(new_node);
+        new_graph.add_node(new_node).unwrap();
 
         if split_list.len() > 1 {
             let partition: Vec<String> = split_list[1].split(" ").map(String::from).collect();
@@ -38,7 +38,7 @@ pub fn graph_from_file(path: &str) -> Result<Graph<Friend>, String> {
                 if part.is_empty() {
                     continue;
                 }
-                new_graph.add_connection(&split_list[0], &part);
+                new_graph.add_connection(&split_list[0], &part).unwrap();
             }
         }
     }

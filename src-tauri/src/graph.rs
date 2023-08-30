@@ -43,39 +43,39 @@ impl<T> Graph<T> {
         }
     }
 
-    pub fn add_connection(&mut self, from: &str, to: &str) -> bool {
+    pub fn add_connection(&mut self, from: &str, to: &str) -> Result<bool, String> {
         if !self.hash.contains_key(from) {
-            return false;
+            return Err("Already in graph".to_string());
         }
         self.hash.get_mut(from).unwrap().list.insert(to.to_string());
-        true
+        Ok(true)
     }
 
-    pub fn remove_connection(&mut self, from: &str, to: &str) -> bool {
+    pub fn remove_connection(&mut self, from: &str, to: &str) -> Result<bool, String> {
         if !self.hash.contains_key(from) || !self.hash.contains_key(to) {
-            return false;
+            return Err("Node doesn't exist".to_string());
         }
         self.hash.get_mut(from).unwrap().list.remove(to);
-        true
+        Ok(true)
     }
 
-    pub fn add_node(&mut self, to_add: Node<T>) -> bool {
+    pub fn add_node(&mut self, to_add: Node<T>) -> Result<bool, String> {
         if self.hash.contains_key(&to_add.key) {
-            return false;
+            return Err("Node already exists".to_string());
         }
         self.hash.insert(to_add.key.clone(), to_add);
-        true
+        Ok(true)
     }
 
-    pub fn remove_node(&mut self, key: &str) -> bool {
+    pub fn remove_node(&mut self, key: &str) -> Result<bool, String> {
         if !self.hash.contains_key(key) {
-            return false;
+            return Err("Node doesn't exist".to_string());
         }
         let node = self.hash.remove(key).unwrap();
         for conn in node.list {
-            self.remove_connection(key, &conn);
+            self.remove_connection(key, &conn).unwrap();
         }
-        true
+        Ok(true)
     }
 
     // Sends the graph to the visualizer
@@ -84,21 +84,21 @@ impl<T> Graph<T> {
         for key in &self.hash {
             retval.push((key.0.to_string(), key.1.list.clone().into_iter().collect()));
         }
-        return retval;
+        retval
     }
 
-    pub fn get_connections(&self, from: &str) -> Vec<String> {
+    pub fn get_connections(&self, from: &str) -> Result<Vec<String>, String> {
         if !self.hash.contains_key(from) {
-            return Vec::new();
+            return Err("Node doesn't exist".to_string());
         }
-        self
+        Ok(self
             .hash
             .get(from)
             .unwrap()
             .list
             .clone()
             .into_iter()
-            .collect()
+            .collect())
     }
 
     pub fn print_dfs(&self, from: &str) -> Vec<String> {
@@ -116,7 +116,7 @@ impl<T> Graph<T> {
         hash.insert(node.to_string());
         // Processing starts here
         list.push(node.to_string());
-        for str in self.get_connections(node) {
+        for str in self.get_connections(node).unwrap() {
             self.dfs_rec(str.as_str(), list, hash);
         }
     }
@@ -132,7 +132,7 @@ impl<T> Graph<T> {
             let current: String = queue.pop_front().unwrap();
             visted.push(current.clone());
             process_list.insert(current.clone());
-            for str in self.get_connections(&current) {
+            for str in self.get_connections(&current).unwrap() {
                 if !process_list.contains(&str) {
                     process_list.insert(str.clone());
                     queue.push_back(str);

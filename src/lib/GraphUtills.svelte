@@ -9,11 +9,11 @@
     export let width;
     export let height;
     export let graphData;
-    export let connection_cache;
     export let parsed_data;
 
     let linkDistance = 100;
     let nodeStrength = -10;
+    let NonOpacity = 0.4;
     let selectedNode = "";
     let tooltip;
     let link;
@@ -39,19 +39,19 @@
     const handleConnections = (value) => {
         console.log("Handler Connections");
         if (value) connectionNodeStyling();
-        else updateNodeStyling();
+        else resetNodeStyling();
     };
 
     const handleDfs = (value) => {
         console.log("Handler DFS");
         if (value) dfsNodeStyling();
-        else updateNodeStyling();
+        else resetNodeStyling();
     };
 
     const handleBfs = (value) => {
         console.log("Handler BFS");
         if (value) bfsNodeStyling();
-        else updateNodeStyling();
+        else resetNodeStyling();
     };
 
     async function bfsNodeStyling() {
@@ -62,7 +62,7 @@
             const HSLStr = "HSL(" + colorIndex + ", 100%, 50%";
             if (d.id === selectedNode) return "green";
             if (conncections.includes(d.id)) {
-                colorIndex += 25;
+                colorIndex += 20;
                 return HSLStr;
             } else return "#724cf9";
         });
@@ -76,45 +76,72 @@
             const HSLStr = "HSL(" + colorIndex + ", 100%, 50%";
             if (d.id === selectedNode) return "green";
             if (conncections.includes(d.id)) {
-                colorIndex += 25;
+                colorIndex += 20;
                 return HSLStr;
             } else return "#724cf9";
         });
     }
 
     async function connectionNodeStyling() {
-        const conncections = await invoke("send_graph_connections", {
+        const connections = await invoke("send_graph_connections", {
             id: selectedNode,
         });
-        console.log(conncections);
+        console.log(connections);
         node.style("fill", (d) => {
             if (d.id === selectedNode) return "green";
-            if (conncections.includes(d.id)) {
+            if (connections.includes(d.id)) {
                 return "red";
             } else return "#724cf9";
+        }).style("opacity", (d) => {
+            if (d.id === selectedNode) return 1;
+            if (connections.includes(d.id)) {
+                return 1;
+            } else return NonOpacity;
         });
+        link.style("stroke", (d) => {
+            // Check if the source and target of the link are in connections
+            if (d.source.id == selectedNode) {
+                return "white"; // Change to the desired lighter color
+            }
+            return "#464F51"; // Default color for links
+        })
+            .style("opacity", (d) => {
+                if (!(d.source.id == selectedNode)) {
+                    return NonOpacity; // Adjust the opacity for non-connected links
+                }
+                return 1; // Default opacity for connected links
+            })
+            .attr("marker-end", (d) => {
+                if (d.source.id == selectedNode) {
+                    return "url(#arrow-white)";
+                }
+                return null; // Remove marker for connected links
+            });
     }
 
-    async function updateNodeStyling(clickedID) {
+    async function resetNodeStyling(clickedID) {
         node.style("fill", (d) => {
             if (d.id === selectedNode) return "green";
-            if (clickedID === null) return "#724cf9";
-            if (!connection_cache.has(clickedID)) return "#724cf9";
-            const cacheValue = Array(connection_cache.get(clickedID));
-            if (cacheValue.length == 0) return "#724cf9";
-            // I FUCKING HATE JAVASCRIPT AAAHHH!
-
-            const isIdInCache = cacheValue.at(0).includes(d.id);
-            if (isIdInCache) {
-                console.log("Changed!");
-                return "red";
-            } else {
-                return "#724cf9";
-            }
+            return "#724cf9";
+        }).style("opacity", (d) => {
+            return 1; // Default opacity for connected links
         });
+        link.style("stroke", (d) => {
+            // Check if the source and target of the link are in connections
+            return "#464F51"; // Default color for links
+        })
+            .style("opacity", (d) => {
+                return 1; // Default opacity for connected links
+            })
+            .attr("marker-end", (d) => {
+                // if (d.source.id == selectedNode) {
+                //     return "url(#arrow)";
+                // }
+                return "url(#arrow)"; // Remove marker for connected links
+            });
     }
 
-    onMount(() => {
+    function init() {
         const linkData = graphData.links.map((link) => ({
             ...link,
             source: graphData.nodes.find((node) => node.id === link.source),
@@ -151,7 +178,7 @@
                 .style("left", mouseX + 10 + "px")
                 .style("top", mouseY - 20 + "px");
 
-            // updateNodeStyling(d.id);
+            // resetNodeStyling(d.id);
         }
 
         function handleNodeClick(event, node) {
@@ -159,13 +186,13 @@
             // Implement your logic to display options for the clicked node
             console.log("Node clicked:", node.id);
             selectedNode = node.id;
-            updateNodeStyling();
+            resetNodeStyling();
             // You can show a modal or update a state to show options
         }
 
         function handleMouseOut() {
             tooltip.style("opacity", 0);
-            // updateNodeStyling(null);
+            // resetNodeStyling(null);
         }
 
         simulation.alpha(0.1).restart();
@@ -184,7 +211,7 @@
             }).attr("cy", (d) => {
                 return (d.y = Math.max(0, Math.min(height, d.y)));
             });
-            // updateNodeStyling();
+            // resetNodeStyling();
         }
 
         function dragStarted(event, d) {
@@ -221,6 +248,10 @@
 
         // Add window resize event listener
         window.addEventListener("resize", handleResize);
+    }
+
+    onMount(() => {
+        init();
     });
 </script>
 
@@ -263,7 +294,7 @@
     <div class="slider_container">
         <CustomSlider
             min={0}
-            max={500}
+            max={750}
             step={1}
             label="Link Distance"
             onMove={updateGraph}
@@ -276,6 +307,14 @@
             label="Node Strength"
             onMove={updateGraph}
             bind:value={nodeStrength}
+        />
+        <CustomSlider
+            min={0.0}
+            max={1}
+            step={0.01}
+            label="Unrelated node Opacity"
+            onMove={updateGraph}
+            bind:value={NonOpacity}
         />
     </div>
 </div>
